@@ -14,6 +14,7 @@ import com.huawei.services.runtime.entity.apig.APIGTriggerResponse;
 import com.huaweiar.ecs.api.ApiDataBuilder;
 import com.huaweiar.ecs.api.ApiEnum;
 import com.huaweiar.ecs.api.ApiService;
+import com.huaweiar.ecs.resources.Environment;
 
 public class App {
 
@@ -24,6 +25,7 @@ public class App {
 	static ApiDataBuilder apiBldr = new ApiDataBuilder();
 	
 	public static void main(String[] args) {
+		System.out.println(Environment.getAccountName());
 		token = apiSrv.postApiCall(
 						apiBldr.buildApiData(ApiEnum.token.ordinal()))
 				.headers().firstValue("X-Subject-Token").get();	
@@ -38,10 +40,11 @@ public class App {
 				apiSrv.getWithTokenAPICall(
 						apiBldr.buildApiData(ApiEnum.tags.ordinal()), 
 						token
-				).body());	
+				).body());
+				System.out.println("getWT: "+jsonResponse);	
 		
 		JSONArray resourcesByTagArray = jsonResponse.getJSONArray("servers");
-		for (int i = 0 ; i < jsonResponse.length() -1; i++) {
+		for (int i = 0 ; i <= jsonResponse.length() ; i++) {
 			JSONObject resourceIdObject = (JSONObject) resourcesByTagArray.get(i);
 			resourceIdList.add(resourceIdObject.get("id").toString());
 		}
@@ -60,6 +63,13 @@ public class App {
         System.out.println(event);
         Map<String, String> headers = new HashMap<String, String>();
         headers.put("Content-Type", "application/json");
+		System.out.println(Environment.getAccountName());
+		token = apiSrv.postApiCall(
+						apiBldr.buildApiData(ApiEnum.token.ordinal()))
+				.headers().firstValue("X-Subject-Token").get();	
+		System.out.println(token);
+		HttpResponse<String> response = changeStateEcsList(getEcsListByTag());
+		System.out.println(response.body());
         return new APIGTriggerResponse(200, headers, event.toString());
     }
 

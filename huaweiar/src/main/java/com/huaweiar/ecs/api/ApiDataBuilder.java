@@ -76,9 +76,10 @@ public class ApiDataBuilder {
 
 	public ApiDataEntity buildApiData(Integer apisIndex, ArrayList<String> ecsIdList) {
 		ApiDataEntity data = null;
+		System.out.println(ecsIdList);
 		if (Environment.getFunction().contentEquals("os-start")) {
 			JSONObject jsonTemplate = new JSONObject(startEcsJsonBody);
-
+			
 			for (Integer i = 0 ; i <= ecsIdList.size() - 1 ; i++) {
 				JSONObject tmp = (JSONObject) jsonTemplate.get("os-start");
 				tmp.getJSONArray("servers")

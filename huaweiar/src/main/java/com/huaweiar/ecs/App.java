@@ -18,17 +18,16 @@ import com.huaweiar.ecs.resources.Environment;
 
 public class App {
 
-	static ApiService apiSrv= new ApiService();
-	
+	static ApiService apiSrv = new ApiService();
+
 	static String token;
-	
+
 	static ApiDataBuilder apiBldr = new ApiDataBuilder();
-	
+
 	public static void main(String[] args) {
 		System.out.println(Environment.getAccountName());
-		token = apiSrv.postApiCall(
-						apiBldr.buildApiData(ApiEnum.token.ordinal()))
-				.headers().firstValue("X-Subject-Token").get();	
+		token = apiSrv.postApiCall(apiBldr.buildApiData(ApiEnum.token.ordinal())).headers()
+				.firstValue("X-Subject-Token").get();
 		System.out.println(token);
 		HttpResponse<String> response = changeStateEcsList(getEcsListByTag());
 		System.out.println(response.body());
@@ -37,44 +36,37 @@ public class App {
 	public static ArrayList<String> getEcsListByTag() {
 		ArrayList<String> resourceIdList = new ArrayList<String>();
 		JSONObject jsonResponse = new JSONObject(
-				apiSrv.getWithTokenAPICall(
-						apiBldr.buildApiData(ApiEnum.tags.ordinal()), 
-						token
-				).body());
-				System.out.println("getWT: "+jsonResponse);	
-		
+				apiSrv.getWithTokenAPICall(apiBldr.buildApiData(ApiEnum.tags.ordinal()), token).body());
+		System.out.println("getWT: " + jsonResponse);
+
 		JSONArray resourcesByTagArray = jsonResponse.getJSONArray("servers");
-		for (int i = 0 ; i <= jsonResponse.length() ; i++) {
+		for (int i = 0; i <= jsonResponse.length(); i++) {
 			JSONObject resourceIdObject = (JSONObject) resourcesByTagArray.get(i);
 			resourceIdList.add(resourceIdObject.get("id").toString());
 		}
 
 		return resourceIdList;
 	}
-	
+
 	public static HttpResponse<String> changeStateEcsList(ArrayList<String> resourceIdList) {
-		return apiSrv.postWithTokenAPICall(
-				apiBldr.buildApiData(ApiEnum.ecs.ordinal(), resourceIdList), 
-				token
-		);
+		return apiSrv.postWithTokenAPICall(apiBldr.buildApiData(ApiEnum.ecs.ordinal(), resourceIdList), token);
 	}
-	
-	public APIGTriggerResponse apigTest(APIGTriggerEvent event, Context context){
-        System.out.println(event);
-        Map<String, String> headers = new HashMap<String, String>();
-        headers.put("Content-Type", "application/json");
+
+	public APIGTriggerResponse apigTest(APIGTriggerEvent event, Context context) {
+		System.out.println(event);
+		Map<String, String> headers = new HashMap<String, String>();
+		headers.put("Content-Type", "application/json");
 		System.out.println(Environment.getAccountName());
-		token = apiSrv.postApiCall(
-						apiBldr.buildApiData(ApiEnum.token.ordinal()))
-				.headers().firstValue("X-Subject-Token").get();	
+		token = apiSrv.postApiCall(apiBldr.buildApiData(ApiEnum.token.ordinal())).headers()
+				.firstValue("X-Subject-Token").get();
 		System.out.println(token);
 		HttpResponse<String> response = changeStateEcsList(getEcsListByTag());
 		System.out.println(response.body());
-        return new APIGTriggerResponse(200, headers, event.toString());
-    }
+		return new APIGTriggerResponse(200, headers, event.toString());
+	}
 
-    public void  ownEvent(MyEvent event, Context ctx){
-        System.out.println(event.toString());
-    }
-	
+	public void ownEvent(MyEvent event, Context ctx) {
+		System.out.println(event.toString());
+	}
+
 }

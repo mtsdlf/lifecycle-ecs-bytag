@@ -35,16 +35,25 @@ public class App {
 
 	public static ArrayList<String> getEcsListByTag() {
 		ArrayList<String> resourceIdList = new ArrayList<String>();
+		Integer i = 0;
+		
 		JSONObject jsonResponse = new JSONObject(
-				apiSrv.getWithTokenAPICall(apiBldr.buildApiData(ApiEnum.tags.ordinal()), token).body());
-		System.out.println("getWT: " + jsonResponse);
-
+				apiSrv.getWithTokenAPICall(
+						apiBldr.buildApiData(
+								ApiEnum.tags.ordinal()), token).body());
 		JSONArray resourcesByTagArray = jsonResponse.getJSONArray("servers");
-		for (int i = 0; i <= jsonResponse.length(); i++) {
-			JSONObject resourceIdObject = (JSONObject) resourcesByTagArray.get(i);
-			resourceIdList.add(resourceIdObject.get("id").toString());
-		}
+		Integer arrayLength = jsonResponse.getInt("count");
 
+		while ( i <= arrayLength -1 && arrayLength != 1) {
+			JSONObject resourceIdObject = (JSONObject) resourcesByTagArray.get(i);
+			resourceIdList.add(resourceIdObject.getString("id"));
+			i++;
+		}
+		if (arrayLength == 1) {
+			JSONObject resourceIdObject = (JSONObject) resourcesByTagArray.get(0);
+			resourceIdList.add(resourceIdObject.getString("id"));
+			i++;
+		}
 		return resourceIdList;
 	}
 
